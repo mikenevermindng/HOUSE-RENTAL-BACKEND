@@ -4,11 +4,18 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 
 // connect mongoDB
-mongoose.connect(process.env.URI, {
-	useUnifiedTopology: true,
-	useNewUrlParser: true,
-	useCreateIndex: true
-});
+mongoose
+	.connect(process.env.URI, {
+		useUnifiedTopology: true,
+		useNewUrlParser: true,
+		useCreateIndex: true
+	})
+	.then((res) => {
+		console.log('connected');
+	})
+	.catch((error) => {
+		console.log('error');
+	});
 
 // express config
 const express = require('express');
@@ -18,11 +25,15 @@ const port = process.env.PORT || 3001;
 // middlware place
 
 // import router
+const postAccommodationRouter = require('./routers/accomodationPostRouter');
 
 // config third party moudules
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
+
+// Router place
+app.use('/accommodationPost', postAccommodationRouter);
 
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');
