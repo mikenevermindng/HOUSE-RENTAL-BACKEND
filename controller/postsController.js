@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 module.exports.index = (req, res, next) => {
 	const filterOption = req.body.filterOption;
 	AccommodationPost.find(filterOption)
-		.populate([ { path: 'rating', model: 'rating' }, { path: 'facilities', model: 'facilities' } ])
+		.populate('rating')
 		.exec()
 		.then((docs) => {
 			const response = {
@@ -16,7 +16,7 @@ module.exports.index = (req, res, next) => {
 			res.status(200).json(response);
 		})
 		.catch((err) => {
-			res.status(500).json({
+			res.status(404).json({
 				error: err
 			});
 		});
@@ -25,9 +25,7 @@ module.exports.index = (req, res, next) => {
 module.exports.generatePostAccommodation = async (req, res, next) => {
 	const { materialFacilitiesInfo, accommodationInfo } = req.body;
 	const materialFacilities = new MaterialFacilities(materialFacilitiesInfo);
-	const rating = new Rating({
-		ratedTime: [ { time: Date.now(), stars: 4 }, { time: Date.now(), stars: 5 }, { time: Date.now(), stars: 5 } ]
-	});
+	const rating = new Rating();
 	const post = new AccommodationPost({
 		...accommodationInfo,
 		ownerId: rating._id,
@@ -38,7 +36,12 @@ module.exports.generatePostAccommodation = async (req, res, next) => {
 	Promise.all(listSaving.map((doc) => doc.save()))
 		.then((result) => {
 			res.status(200).json({
-				message: 'success'
+				message: 'success',
+				request: {
+					type: 'GET',
+					description: 'GET all posts',
+					url: 'http://localhost:3001/accommodationPost/' + post._id
+				}
 			});
 		})
 		.catch((err) => {
@@ -58,8 +61,8 @@ module.exports.getPostById = (req, res, next) => {
 					Post: doc,
 					request: {
 						type: 'GET',
-						description: 'GET all products',
-						url: 'http://localhost:3001/postAccommodation/'
+						description: 'GET all posts',
+						url: 'http://localhost:3001/accommodationPost/'
 					}
 				});
 			} else {

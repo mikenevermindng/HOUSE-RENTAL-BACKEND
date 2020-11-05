@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const postAccommodationSchema = mongoose.Schema({
 	ownerId: {
 		type: mongoose.Schema.Types.ObjectId,
+		ref: 'owner',
 		required: true
 	},
 	city: {

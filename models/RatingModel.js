@@ -27,19 +27,15 @@ const ratingSchema = mongoose.Schema({
 });
 
 ratingSchema.pre('save', function(next) {
-	let rating = this;
-	console.log(rating);
-	rating.rate = rating.ratedTime.reduce((time) => {
-		return time.stars / (this.ratedTime.length === 0 ? 1 : this.ratedTime.length);
+	this.rate = this.ratedTime.reduce((total, time) => {
+		return total + time.stars / this.ratedTime.length;
 	}, 0);
 	next();
 });
 
 ratingSchema.pre('post', function(next) {
-	let rating = this;
-	console.log(rating);
-	rating.rate = rating.ratedTime.reduce((time) => {
-		return time.stars / (this.ratedTime.length === 0 ? 1 : this.ratedTime.length);
+	this.rate = this.ratedTime.reduce((total, time) => {
+		return total + time.stars / this.ratedTime.length;
 	}, 0);
 	next();
 });
