@@ -8,7 +8,8 @@ mongoose
 	.connect(process.env.URI, {
 		useUnifiedTopology: true,
 		useNewUrlParser: true,
-		useCreateIndex: true
+		useCreateIndex: true,
+		useFindAndModify: false
 	})
 	.then((res) => {
 		console.log('connected');
@@ -46,10 +47,6 @@ app.use((req, res, next) => {
 });
 
 // Router config place
-
-app.get('/', (req, res) => {
-	res.send('Hello World!');
-});
 
 app.use((req, res, next) => {
 	const error = new Error('Not found');

@@ -1,25 +1,24 @@
 const AccommodationPost = require('../models/AccommodationPosterModel');
 const MaterialFacilities = require('../models/MaterialFacilitiesModel');
 const Rating = require('../models/RatingModel');
-const mongoose = require('mongoose');
 
-module.exports.index = (req, res, next) => {
+module.exports.index = async (req, res, next) => {
 	const filterOption = req.body.filterOption;
-	AccommodationPost.find(filterOption)
-		.populate('rating')
-		.exec()
-		.then((docs) => {
-			const response = {
-				count: docs.length,
-				posts: docs
-			};
-			res.status(200).json(response);
-		})
-		.catch((err) => {
-			res.status(404).json({
-				error: err
-			});
+	try {
+		const accommodationPosts = await AccommodationPost.find(filterOption).populate('rating materialFacilities');
+		const response = {
+			count: accommodationPosts.length,
+			posts: accommodationPosts
+		};
+		res.status(200).json(response);
+		return;
+	} catch (error) {
+		console.log(error);
+		res.status(404).json({
+			error: error
 		});
+		return;
+	}
 };
 
 module.exports.generatePostAccommodation = async (req, res, next) => {
@@ -46,31 +45,75 @@ module.exports.generatePostAccommodation = async (req, res, next) => {
 		})
 		.catch((err) => {
 			console.log(err);
-			res.status(404).json({ message: err.message });
+			res.status(400).json({ message: err.message });
 		});
 };
 
-module.exports.getPostById = (req, res, next) => {
+module.exports.getPostById = async (req, res, next) => {
 	const id = req.params.accommodationPostId;
-	AccommodationPost.findById(id)
-		.exec()
-		.then((doc) => {
-			console.log('From database', doc);
-			if (doc) {
-				res.status(200).json({
-					Post: doc,
-					request: {
-						type: 'GET',
-						description: 'GET all posts',
-						url: 'http://localhost:3001/accommodationPost/'
-					}
-				});
-			} else {
-				res.status(404).json({ message: 'No valid entry found for provided ID' });
+	try {
+		let reqPost = await AccommodationPost.findById(id);
+		let response = {
+			post: reqPost,
+			request: {
+				type: 'GET',
+				description: 'GET all posts',
+				url: 'http://localhost:3001/accommodationPost/'
 			}
+		};
+		res.status(200).json(response);
+	} catch (err) {
+		res.status(404).json({ message: 'No valid entry found for provided ID' });
+	}
+};
+
+module.exports.deletePostById = async (req, res, next) => {
+	const id = req.params.accommodationPostId;
+	try {
+		let accommodationPost = await AccommodationPost.findById(id);
+		let ratingId = accommodationPost.rating._id;
+		let materialFacilitiesId = accommodationPost.materialFacilities._id;
+		Promise.all([
+			AccommodationPost.deleteOne({ _id: id }),
+			Rating.deleteOne({ _id: ratingId }),
+			MaterialFacilities.deleteOne({ _id: materialFacilitiesId })
+		])
+			.then((resutlt) => {
+				res.status(200).json(resutlt);
+			})
+			.catch((error) => {
+				console.log(error);
+				res.status(400).json({ message: 'fail' });
+			});
+	} catch (err) {
+		res.status(400).json({ message: 'error' });
+	}
+};
+
+module.exports.updatePostById = async (req, res, next) => {
+	const postId = '5fa41b60ccf298466cac36eb';
+	const postUpdateData = {
+		city: 'HCM city'
+	};
+	const materialFacilitiesId = '5fa41b60ccf298466cac36e9';
+	const facilityUpdateData = {
+		electricWaterHeater: false
+	};
+	Promise.all([
+		AccommodationPost.findByIdAndUpdate({ _id: postId }, postUpdateData).exec(),
+		MaterialFacilities.findOneAndUpdate({ _id: materialFacilitiesId }, facilityUpdateData).exec()
+	])
+		.then((result) => {
+			let response = {
+				request: {
+					type: 'GET',
+					description: 'GET post',
+					url: 'http://localhost:3001/accommodationPost/' + postId
+				}
+			};
+			res.status(200).json(response);
 		})
-		.catch((err) => {
-			console.log(err);
-			res.status(500).json(err);
+		.catch((error) => {
+			res.status(400).json(error);
 		});
 };

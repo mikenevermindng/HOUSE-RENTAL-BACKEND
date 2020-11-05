@@ -17,10 +17,10 @@ route.get('/', controller.index);
 
 route.get('/:accommodationPostId', controller.getPostById);
 
-// route.patch('/:accommodationPostId', controller.updateById);
+route.patch('/:accommodationPostId', controller.updatePostById);
 
 route.post('/', controller.generatePostAccommodation);
 
-// route.delete('/:accommodationPostId', checkAuth, controller.deleteById);
+route.delete('/:accommodationPostId', controller.deletePostById);
 
 module.exports = route;
