@@ -5,9 +5,16 @@ const notificationSchema = mongoose.Schema({
 		type: String,
 		require: true
 	},
+	senderId: {
+		type: mongoose.Schema.Types.ObjectId,
+		require: true
+	},
 	recieverIds: {
 		type: mongoose.Schema.Types.ObjectId,
 		require: true
+	},
+	payload: {
+		type: {}
 	}
 });
 

@@ -25,16 +25,18 @@ const port = process.env.PORT || 3001;
 
 // middlware place
 
-// import router
-const postAccommodationRouter = require('./routers/accomodationPostRouter');
-
 // config third party moudules
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
+// import router
+const postAccommodationRouter = require('./routers/accomodationPostRouter');
+const ratingRouter = require('./routers/ratingRouter');
+
 // Router place
 app.use('/accommodationPost', postAccommodationRouter);
+app.use('/rating', ratingRouter);
 
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');

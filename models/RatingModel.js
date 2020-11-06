@@ -13,17 +13,17 @@ const ratingSchema = mongoose.Schema({
 			stars: {
 				type: Number,
 				min: 1,
-				max: 5
+				max: 5,
+				required: true
+			},
+			userId: {
+				type: mongoose.Schema.Types.ObjectId,
+				required: true
 			}
 		}
 	],
-	likes: {
-		type: Number,
-		default: 0
-	},
-	visits: {
-		type: [ Date ]
-	}
+	likedUser: [ mongoose.Schema.Types.ObjectId ],
+	visits: [ Date ]
 });
 
 ratingSchema.pre('save', function(next) {
