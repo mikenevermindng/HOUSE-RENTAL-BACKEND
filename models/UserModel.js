@@ -20,7 +20,25 @@ const renterSchema = mongoose.Schema({
 		required: true,
 		min: 8
 	},
-	phoneNumber: { type: String, required: true, match: /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/ },
+	phoneNumber: { 
+		type: String, 
+		required: true, 
+		match: /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/ 
+	},
+	citizenId: {
+		type: String,
+		require: true,
+		max: 12,
+		min: 9
+	},
+	city: {
+		type: String,
+		require: true
+	},
+	address: {
+		type: String,
+		require: true
+	},
 	follow: {
 		type: [ mongoose.Schema.Types.ObjectId ]
 	}
