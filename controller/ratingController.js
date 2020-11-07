@@ -4,19 +4,20 @@ require('mongoose').mongo.ObjectID;
 module.exports.likeHandler = async (req, res, next) => {
 	const userId = req.body.userId;
 	const ratingId = req.params.ratingId;
+	const messageDetail = {};
 	try {
-		const updateMessage = await Rating.findOneAndUpdate({ _id: ratingId }, { $push: { likedUser: userId } }).exec();
-		if (updateMessage) {
-			const response = {
-				message: 'success',
-				detail: updateMessage
-			};
-			res.status(200).json(response);
+		const accessingRating = await Rating.findById(ratingId);
+		const index = accessingRating.likedUser.findIndex((userIdInList) => userIdInList.toString() === userId);
+		if (index === -1) {
+			accessingRating.likedUser.push(userId);
+			messageDetail = await accessingRating.save();
+			res.status(200).json({ message: 'success', detail: messageDetail });
 		} else {
-			res.status(400).json({ message: 'fail' });
+			res.status(401).json({ message: 'user liked', detail: messageDetail });
 		}
 	} catch (error) {
-		res.status(400).json({ message: 'error' });
+		console.log(error);
+		res.status(400).json({ message: error });
 	}
 };
 
