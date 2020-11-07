@@ -17,9 +17,9 @@ route.get('/', controller.index);
 
 route.get('/:accommodationPostId', controller.getPostById);
 
-route.patch('/:accommodationPostId', controller.updatePostById);
+route.post('/:accommodationPostId', controller.requestUpdatePostById);
 
-route.post('/', controller.generatePostAccommodation);
+route.post('/', controller.generateAccommodationPoster);
 
 route.delete('/:accommodationPostId', controller.deletePostById);
 

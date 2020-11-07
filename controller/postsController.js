@@ -1,6 +1,8 @@
 const AccommodationPost = require('../models/AccommodationPosterModel');
 const MaterialFacilities = require('../models/MaterialFacilitiesModel');
 const Rating = require('../models/RatingModel');
+const Notification = require('../models/NotificationModel');
+const { RESPONSE_MESSAGE } = require('../Constants/MessageConstants');
 
 module.exports.index = async (req, res, next) => {
 	const filterOption = req.body.filterOption;
@@ -21,25 +23,15 @@ module.exports.index = async (req, res, next) => {
 	}
 };
 
-module.exports.generatePostAccommodation = async (req, res, next) => {
-	const { materialFacilitiesInfo, accommodationInfo } = req.body;
-	const materialFacilities = new MaterialFacilities(materialFacilitiesInfo);
-	const rating = new Rating();
-	const post = new AccommodationPost({
-		...accommodationInfo,
-		ownerId: rating._id,
-		rating: rating._id,
-		materialFacilities: materialFacilities._id
-	});
-	const listSaving = [ post, rating, materialFacilities ];
-	Promise.all(listSaving.map((doc) => doc.save()))
+module.exports.generateAccommodationPoster = async (req, res, next) => {
+	AccommodationPost.generateAccommodationPoster(req.body)
 		.then((result) => {
 			res.status(200).json({
 				message: 'success',
 				request: {
 					type: 'GET',
 					description: 'GET all posts',
-					url: 'http://localhost:3001/accommodationPost/' + post._id
+					url: 'http://localhost:3001/accommodationPost/'
 				}
 			});
 		})
@@ -52,7 +44,7 @@ module.exports.generatePostAccommodation = async (req, res, next) => {
 module.exports.getPostById = async (req, res, next) => {
 	const id = req.params.accommodationPostId;
 	try {
-		let reqPost = await AccommodationPost.findById(id);
+		let reqPost = await AccommodationPost.findById(id).populate('rating materialFacilities');
 		let response = {
 			post: reqPost,
 			request: {
@@ -70,14 +62,7 @@ module.exports.getPostById = async (req, res, next) => {
 module.exports.deletePostById = async (req, res, next) => {
 	const id = req.params.accommodationPostId;
 	try {
-		let accommodationPost = await AccommodationPost.findById(id);
-		let ratingId = accommodationPost.rating._id;
-		let materialFacilitiesId = accommodationPost.materialFacilities._id;
-		Promise.all([
-			AccommodationPost.deleteOne({ _id: id }),
-			Rating.deleteOne({ _id: ratingId }),
-			MaterialFacilities.deleteOne({ _id: materialFacilitiesId })
-		])
+		AccommodationPost.deletePostById(id)
 			.then((resutlt) => {
 				res.status(200).json(resutlt);
 			})
@@ -90,20 +75,13 @@ module.exports.deletePostById = async (req, res, next) => {
 	}
 };
 
-module.exports.updatePostById = async (req, res, next) => {
-	const postId = '5fa41b60ccf298466cac36eb';
-	const postUpdateData = {
-		city: 'HCM city'
-	};
-	const materialFacilitiesId = '5fa41b60ccf298466cac36e9';
-	const facilityUpdateData = {
-		electricWaterHeater: false
-	};
-	Promise.all([
-		AccommodationPost.findByIdAndUpdate({ _id: postId }, postUpdateData).exec(),
-		MaterialFacilities.findOneAndUpdate({ _id: materialFacilitiesId }, facilityUpdateData).exec()
-	])
-		.then((result) => {
+module.exports.requestUpdatePostById = async (req, res, next) => {
+	const postId = req.params.accommodationPostId;
+	const { payload, senderInfo } = req.body;
+	const poster = await AccommodationPost.findById(postId);
+	if (poster.ownerId.toString() === senderInfo.senderId) {
+		try {
+			let answer = await Notification.changeRequestGenerator(postId, payload, senderInfo);
 			let response = {
 				request: {
 					type: 'GET',
@@ -112,8 +90,11 @@ module.exports.updatePostById = async (req, res, next) => {
 				}
 			};
 			res.status(200).json(response);
-		})
-		.catch((error) => {
+		} catch (error) {
+			console.log(error);
 			res.status(400).json(error);
-		});
+		}
+	} else {
+		res.status(400).json({ message: RESPONSE_MESSAGE.ERROR });
+	}
 };

@@ -44,4 +44,4 @@ const renterSchema = mongoose.Schema({
 	}
 });
 
-module.exports = mongoose.model('Renter', renterSchema);
+module.exports = mongoose.model('User', renterSchema);
