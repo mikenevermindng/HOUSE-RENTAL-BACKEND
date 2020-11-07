@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const MaterialFacilities = require('./MaterialFacilitiesModel');
+const Rating = require('./RatingModel');
+const Notification = require('./NotificationModel');
 
 const postAccommodationSchema = mongoose.Schema({
 	ownerId: {
@@ -85,5 +88,40 @@ const postAccommodationSchema = mongoose.Schema({
 		default: false
 	}
 });
+
+postAccommodationSchema.statics.generateAccommodationPoster = async function(info) {
+	const { materialFacilitiesInfo, accommodationInfo, senderId, senderName } = info;
+	const materialFacilities = new MaterialFacilities(materialFacilitiesInfo);
+	const rating = new Rating();
+	const post = new this({
+		...accommodationInfo,
+		ownerId: rating._id,
+		rating: rating._id,
+		materialFacilities: materialFacilities._id
+	});
+	const notification = await Notification.approvalNotificationGenerator(senderId, senderName);
+	const listSaving = [ post, rating, materialFacilities, notification ];
+	return Promise.all(listSaving.map((doc) => doc.save()));
+};
+
+postAccommodationSchema.statics.updatePostById = async function(payload) {
+	const { postUpdateData, facilityUpdateData, postId } = payload;
+	const materialFacilitiesId = await this.findById(postId).materialFacilities;
+	return Promise.all([
+		this.findByIdAndUpdate({ _id: postId }, postUpdateData).exec(),
+		MaterialFacilities.findOneAndUpdate({ _id: materialFacilitiesId }, facilityUpdateData).exec()
+	]);
+};
+
+postAccommodationSchema.statics.deletePostById = async function(id) {
+	let accommodationPost = await this.findById(id);
+	let ratingId = accommodationPost.rating._id;
+	let materialFacilitiesId = accommodationPost.materialFacilities._id;
+	return Promise.all([
+		this.deleteOne({ _id: id }),
+		Rating.deleteOne({ _id: ratingId }),
+		MaterialFacilities.deleteOne({ _id: materialFacilitiesId })
+	]);
+};
 
 module.exports = mongoose.model('accommodation_post', postAccommodationSchema);
