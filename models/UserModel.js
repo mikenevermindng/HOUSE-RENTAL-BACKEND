@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+
 const renterSchema = mongoose.Schema({
 	firstName: {
 		type: String,

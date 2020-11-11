@@ -7,4 +7,6 @@ router.post('/register', controller.register);
 
 router.delete('/:userId', controller.deleteUser);
 
+router.put('/:userId', controller.updateAccount);
+
 module.exports = router

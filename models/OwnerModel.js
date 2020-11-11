@@ -10,7 +10,7 @@ const ownerSchema = mongoose.Schema({
 		require: true
 	},
 	citizenId: {
-		type: Number,
+		type: String,
 		require: true,
 		max: 12,
 		min: 9

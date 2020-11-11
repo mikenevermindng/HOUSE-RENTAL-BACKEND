@@ -35,11 +35,14 @@ app.use("/uploads", express.static("uploads"));
 const postAccommodationRouter = require("./routers/accomodationPostRouter");
 const ratingRouter = require("./routers/ratingRouter");
 const userRouter = require("./routers/usersRouter");
+const ownerRouter = require("./routers/ownerRouter");
 
 // Router place
 app.use("/accommodationPost", postAccommodationRouter);
 app.use("/rating", ratingRouter);
-app.use("/auth", userRouter);
+app.use("/user", userRouter);
+app.use("/owner", ownerRouter);
+
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
