@@ -2,6 +2,8 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const bodyParser = require('body-parser');
+const multer = require('multer');
 
 // connect mongoDB
 mongoose
@@ -27,16 +29,19 @@ const port = process.env.PORT || 3001;
 
 // config third party moudules
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/uploads', express.static('uploads'));
 
 // import router
 const postAccommodationRouter = require('./routers/accomodationPostRouter');
 const ratingRouter = require('./routers/ratingRouter');
+const commentRouter = require('./routers/commentRouter');
 
 // Router place
 app.use('/accommodationPost', postAccommodationRouter);
 app.use('/rating', ratingRouter);
+app.use('/comment', commentRouter);
 
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');

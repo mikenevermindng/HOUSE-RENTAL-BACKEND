@@ -24,21 +24,22 @@ module.exports.index = async (req, res, next) => {
 };
 
 module.exports.generateAccommodationPoster = async (req, res, next) => {
-	AccommodationPost.generateAccommodationPoster(req.body)
-		.then((result) => {
-			res.status(200).json({
-				message: 'success',
-				request: {
-					type: 'GET',
-					description: 'GET all posts',
-					url: 'http://localhost:3001/accommodationPost/'
-				}
-			});
-		})
-		.catch((err) => {
-			console.log(err);
-			res.status(400).json({ message: err.message });
-		});
+	try {
+		console.log(req.body);
+		const generateMessage = AccommodationPost.generateAccommodationPoster(req.body);
+		const response = {
+			message: 'success',
+			request: {
+				type: 'GET',
+				description: 'GET all posts',
+				url: 'http://localhost:3001/accommodationPost/'
+			},
+			detail: generateMessage
+		};
+		res.status(200).json(response);
+	} catch (err) {
+		res.status(400).json({ message: err.message });
+	}
 };
 
 module.exports.getPostById = async (req, res, next) => {

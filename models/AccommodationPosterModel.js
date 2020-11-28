@@ -77,12 +77,6 @@ const postAccommodationSchema = mongoose.Schema({
 		ref: 'rating',
 		required: true
 	},
-	comments: [
-		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'comment'
-		}
-	],
 	isApproved: {
 		type: Boolean,
 		default: false
