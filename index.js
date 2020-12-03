@@ -35,8 +35,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/uploads', express.static('uploads'));
 
 // import router
-const postAccommodationRouter = require('./routers/accomodationPostRouter');
-const ratingRouter = require('./routers/ratingRouter');
 const commentRouter = require('./routers/commentRouter');
 const postAccommodationRouter = require("./routers/accomodationPostRouter");
 const ratingRouter = require("./routers/ratingRouter");
@@ -48,9 +46,6 @@ app.use("/accommodationPost", postAccommodationRouter);
 app.use("/rating", ratingRouter);
 app.use("/user", userRouter);
 app.use("/owner", ownerRouter);
-
-app.use('/accommodationPost', postAccommodationRouter);
-app.use('/rating', ratingRouter);
 app.use('/comment', commentRouter);
 
 app.use((req, res, next) => {
