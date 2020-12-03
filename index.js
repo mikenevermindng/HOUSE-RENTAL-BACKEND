@@ -22,13 +22,14 @@ mongoose
 // express config
 const express = require("express");
 const app = express();
+const bodyParser = require('body-parser')
 const port = process.env.PORT || 3001;
 
 // middlware place
 
 // config third party moudules
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 app.use("/uploads", express.static("uploads"));
 
 // import router

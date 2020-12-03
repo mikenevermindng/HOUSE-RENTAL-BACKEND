@@ -4,43 +4,36 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const myPlaintextPassword = "s0//P4$$w0rD";
 const jwt = require('jsonwebtoken');
-const TOKEN_SECRET = asjfhauhrfkdnjafd;
+const {registerValidation, loginValidation} = require('../middleware/validation');
 
 module.exports.register = async (req, res, next) => {
-  const {
-    firstName,
-    lastName,
-    email,
-    password,
-    phoneNumber,
-    citizenId,
-    address,
-  } = req.body;
-  const users = new Users({
-    firstName,
-    lastName,
-    email,
-    password,
-    phoneNumber,
-    citizenId,
-    address,
+
+  // LET'S VALIDATE DATE BEFORE WE MAKE A USER
+  const {error} = registerValidation(req.body);
+  if(error) return res.status(422).json({
+    message: 'Validation error.',
+    error
   });
+
 
   try {
     // Checking if the user is already in the database
+    const {email, password} = req.body;
     const emailExist = await Users.findOne({ email });
-    if (emailExist)
-      return res.status(400).json({ message: "Email already exists" });
-    console.log(emailExist);
+    if (emailExist) return res.status(400).json({ message: "Email already exists" });
 
     // Hash password
-    const hashPassword = await bcrypt.hash(myPlaintextPassword, saltRounds);
-    console.log(password);
-    users.password = hashPassword;
+    const hashPassword = await bcrypt.hash(password, saltRounds);
 
     // Create a new user
-    const savedUser = await users.save();
-    res.send(savedUser);
+    const user = new Users({...req.body, password: hashPassword});
+    console.log(user)
+    const savedUser = await user.save();
+    res.status(200).json({
+      savedUser
+    })
+    
+
   } catch (error) {
     console.log(error);
     res.status(400).json({ message: "error" });
@@ -48,34 +41,38 @@ module.exports.register = async (req, res, next) => {
 };
 
 module.exports.login = async (req, res, next) => {
+
+  // LET'S VALIDATE DATE BEFORE WE MAKE A USER
+  const {error} = loginValidation(req.body);
+  if(error) return res.status(422).json({
+    message: 'Validation error.',
+    error: error
+  });
+
   try {
     const { email, password } = req.body;
 
     // Checking if the email is not exist
     const user = await Users.findOne({ email });
-    if (!user) res.status(400).json({ message: "Email or password is wrong" });
+    if (!user) return res.status(400).json({ message: "Email or password is wrong" });
 
     // Checking Password is correct
     const validPassword = await bcrypt.compare(password, user.password);
-    console.log(validPassword);
     if (!validPassword) {
-      res.status(400).json({ message: "Email or password is wrong" });
-      return;
+      return res.status(400).json({ message: "Email or password is wrong" });
     }
     
     //Create and assign a token 
-    const token = jwt.sign({_id: userId}, process.env.TOKEN_SECRET );
-    res.header('auth-token', token).json({
-      message: token
+    const { userId } = req.params;
+    const token = jwt.sign({_id: userId, role: 'user'}, process.env.TOKEN_SECRET );
+    res.status(200).json({
+      token: 'Bearer ' +  token,
+      user: user
     });
 
-    //Success
-    res.json({
-      user,
-      message: "Logged in...",
-    });
   } catch (error) {
-    res.status(400).json({ message: "error" });
+    console.log(error)
+    res.status(400).json({ message: "error", detail: error });
   }
 };
 
@@ -127,6 +124,34 @@ module.exports.updateAccount = async (req, res, next) => {
     res.json({
       message: "updated successfully",
     });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: "error" });
+  }
+};
+
+module.exports.getAllUser = async (req, res, next) => {
+  try {
+    const users = await Users.find();
+    res.status(200).json({
+      count: users.length ,
+      users: users
+    })
+    
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: "error" });
+  }
+};
+
+module.exports.getUserById = async (req, res, next) => {
+  try {
+    const {userId} = req.params;
+    const user = await Users.findById(userId);
+    res.status(200).json({
+      user: user
+    })
+    
   } catch (error) {
     console.log(error);
     res.status(400).json({ message: "error" });
