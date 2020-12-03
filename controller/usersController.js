@@ -4,16 +4,16 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const myPlaintextPassword = "s0//P4$$w0rD";
 const jwt = require('jsonwebtoken');
-const {registerValidation, loginValidation} = require('../middleware/validation');
+// const {registerValidation, loginValidation} = require('../middleware/validation');
 
 module.exports.register = async (req, res, next) => {
 
-  // LET'S VALIDATE DATE BEFORE WE MAKE A USER
-  const {error} = registerValidation(req.body);
-  if(error) return res.status(422).json({
-    message: 'Validation error.',
-    error
-  });
+  // // LET'S VALIDATE DATE BEFORE WE MAKE A USER
+  // const {error} = registerValidation(req.body);
+  // if(error) return res.status(422).json({
+  //   message: 'Validation error.',
+  //   error
+  // });
 
 
   try {
@@ -42,12 +42,12 @@ module.exports.register = async (req, res, next) => {
 
 module.exports.login = async (req, res, next) => {
 
-  // LET'S VALIDATE DATE BEFORE WE MAKE A USER
-  const {error} = loginValidation(req.body);
-  if(error) return res.status(422).json({
-    message: 'Validation error.',
-    error: error
-  });
+  // // LET'S VALIDATE DATE BEFORE WE MAKE A USER
+  // const {error} = loginValidation(req.body);
+  // if(error) return res.status(422).json({
+  //   message: 'Validation error.',
+  //   error: error
+  // });
 
   try {
     const { email, password } = req.body;
