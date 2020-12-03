@@ -7,18 +7,19 @@ const multer = require('multer');
 
 // connect mongoDB
 mongoose
-	.connect(process.env.URI, {
-		useUnifiedTopology: true,
-		useNewUrlParser: true,
-		useCreateIndex: true,
-		useFindAndModify: false
-	})
-	.then((res) => {
-		console.log('connected');
-	})
-	.catch((error) => {
-		console.log('error');
-	});
+  .connect(process.env.URI, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+  })
+  .then((res) => {
+    console.log("connected");
+  })
+  .catch((error) => {
+    console.log(error);
+    console.log("can not connect database");
+  });
 
 // express config
 const express = require('express');
@@ -37,20 +38,35 @@ app.use('/uploads', express.static('uploads'));
 const postAccommodationRouter = require('./routers/accomodationPostRouter');
 const ratingRouter = require('./routers/ratingRouter');
 const commentRouter = require('./routers/commentRouter');
+const postAccommodationRouter = require("./routers/accomodationPostRouter");
+const ratingRouter = require("./routers/ratingRouter");
+const userRouter = require("./routers/usersRouter");
+const ownerRouter = require("./routers/ownerRouter");
 
 // Router place
+app.use("/accommodationPost", postAccommodationRouter);
+app.use("/rating", ratingRouter);
+app.use("/user", userRouter);
+app.use("/owner", ownerRouter);
+
 app.use('/accommodationPost', postAccommodationRouter);
 app.use('/rating', ratingRouter);
 app.use('/comment', commentRouter);
 
 app.use((req, res, next) => {
-	res.header('Access-Control-Allow-Origin', '*');
-	res.header('Access-Control-Allow-Header', 'Origin, X-Requested-With', 'Content-Type', 'Accept', 'Authorization');
-	if (req.method === 'OPTIONS') {
-		req.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
-		return res.status(200).json({});
-	}
-	next();
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Header",
+    "Origin, X-Requested-With",
+    "Content-Type",
+    "Accept",
+    "Authorization"
+  );
+  if (req.method === "OPTIONS") {
+    req.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+    return res.status(200).json({});
+  }
+  next();
 });
 
 // Router config place
