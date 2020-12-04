@@ -67,7 +67,7 @@ module.exports.login = async (req, res, next) => {
 
     //Create and assign a token 
     const { ownerId } = req.params;
-    const token = jwt.sign({_id: ownerId, role: 'user'}, process.env.TOKEN_SECRET );
+    const token = jwt.sign({_id: ownerId, role: 'owner'}, process.env.TOKEN_SECRET );
     res.status(200).json({
       token: 'Bearer ' +  token,
       owner: owner
