@@ -1,7 +1,9 @@
-require("dotenv").config();
-const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
-const cors = require("cors");
+require('dotenv').config();
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const multer = require('multer');
 
 // connect mongoDB
 mongoose
@@ -20,9 +22,8 @@ mongoose
   });
 
 // express config
-const express = require("express");
+const express = require('express');
 const app = express();
-const bodyParser = require('body-parser')
 const port = process.env.PORT || 3001;
 
 // middlware place
@@ -30,9 +31,11 @@ const port = process.env.PORT || 3001;
 // config third party moudules
 app.use(cors());
 app.use(bodyParser.json());
-app.use("/uploads", express.static("uploads"));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use('/uploads', express.static('uploads'));
 
 // import router
+const commentRouter = require('./routers/commentRouter');
 const postAccommodationRouter = require("./routers/accomodationPostRouter");
 const ratingRouter = require("./routers/ratingRouter");
 const userRouter = require("./routers/usersRouter");
@@ -45,6 +48,7 @@ app.use("/rating", ratingRouter);
 app.use("/user", userRouter);
 app.use("/owner", ownerRouter);
 app.use("/admin", adminRouter);
+app.use('/comment', commentRouter);
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -65,20 +69,20 @@ app.use((req, res, next) => {
 // Router config place
 
 app.use((req, res, next) => {
-  const error = new Error("Not found");
-  error.status = 404;
-  next(error);
+	const error = new Error('Not found');
+	error.status = 404;
+	next(error);
 });
 
 app.use((error, req, res, next) => {
-  res.status(error.status || 500);
-  res.json({
-    error: {
-      message: error.message,
-    },
-  });
+	res.status(error.status || 500);
+	res.json({
+		error: {
+			message: error.message
+		}
+	});
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+	console.log(`Example app listening at http://localhost:${port}`);
 });

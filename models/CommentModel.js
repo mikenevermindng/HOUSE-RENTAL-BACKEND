@@ -5,7 +5,7 @@ const commentSchema = mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		required: true
 	},
-	userId: {
+	senderId: {
 		type: mongoose.Schema.Types.ObjectId,
 		required: true
 	},
@@ -13,7 +13,7 @@ const commentSchema = mongoose.Schema({
 		type: String,
 		require: true
 	},
-	approved: {
+	isApproved: {
 		type: Boolean,
 		default: false
 	}

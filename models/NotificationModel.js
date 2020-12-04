@@ -19,7 +19,7 @@ const notificationSchema = mongoose.Schema({
 		type: Boolean,
 		require: true
 	},
-	recieverIds: {
+	recieverId: {
 		type: mongoose.Schema.Types.ObjectId
 	},
 	payload: {
@@ -60,6 +60,16 @@ notificationSchema.statics.changeRequestGenerator = async function(postId, paylo
 		isSentToAdmin: true,
 		payload: { ...payload, postId: postId },
 		code: POST_NOTIFICATION_CODE.CHANGE_REQUEST
+	}).save();
+};
+
+notificationSchema.statics.answerRequestNotificationGenerator = async function(recieverId, postId, isApproved) {
+	return new this({
+		senderName: 'Admin',
+		content: isApproved ? ' đã chấp thuận bài đăng của bạn' : ' đã từ chối yêu cầu đăng bài của bạn',
+		recieverId: recieverId,
+		isSentToAdmin: false,
+		code: POST_NOTIFICATION_CODE.ACCEPTED_POSTER
 	}).save();
 };
 
