@@ -26,7 +26,9 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3001;
 
-// middlware place
+// admin place
+const adminRouter = require('./routers/adminRouter');
+app.use("/admin", adminRouter);
 
 // config third party moudules
 app.use(cors());
@@ -40,14 +42,14 @@ const postAccommodationRouter = require("./routers/accomodationPostRouter");
 const ratingRouter = require("./routers/ratingRouter");
 const userRouter = require("./routers/usersRouter");
 const ownerRouter = require("./routers/ownerRouter");
-const adminRouter = require('./routers/adminRouter');
+
+
 
 // Router place
 app.use("/accommodationPost", postAccommodationRouter);
 app.use("/rating", ratingRouter);
 app.use("/user", userRouter);
 app.use("/owner", ownerRouter);
-app.use("/admin", adminRouter);
 app.use('/comment', commentRouter);
 
 app.use((req, res, next) => {

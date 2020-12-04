@@ -1,6 +1,3 @@
-module.exports.fileUploader = (req, res, next) => {
-
-}
 const jwt = require('jsonwebtoken');
 // const TOKEN_SECRET = asjfhauhrfkdnjafd;
 function auth (req, res, next){
