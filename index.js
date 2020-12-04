@@ -37,13 +37,14 @@ const postAccommodationRouter = require("./routers/accomodationPostRouter");
 const ratingRouter = require("./routers/ratingRouter");
 const userRouter = require("./routers/usersRouter");
 const ownerRouter = require("./routers/ownerRouter");
+const adminRouter = require('./routers/adminRouter');
 
 // Router place
 app.use("/accommodationPost", postAccommodationRouter);
 app.use("/rating", ratingRouter);
 app.use("/user", userRouter);
 app.use("/owner", ownerRouter);
-
+app.use("/admin", adminRouter);
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
