@@ -25,7 +25,6 @@ module.exports.index = async (req, res, next) => {
 
 module.exports.generateAccommodationPoster = async (req, res, next) => {
 	try {
-		console.log(req.body);
 		const generateMessage = AccommodationPost.generateAccommodationPoster(req.body);
 		const response = {
 			message: 'success',
@@ -78,11 +77,21 @@ module.exports.deletePostById = async (req, res, next) => {
 
 module.exports.requestUpdatePostById = async (req, res, next) => {
 	const postId = req.params.accommodationPostId;
-	const { payload, senderInfo } = req.body;
+	const { senderId, posterChangeInfomation, materialFacilitiesChangeInfomation } = req.body;
 	const poster = await AccommodationPost.findById(postId);
-	if (poster.ownerId.toString() === senderInfo.senderId) {
+	if (poster.ownerId.toString() !== senderId) {
+		return res.status(400).json({ message: 'you are not the owner of this poster' });
+	}
+	if (!poster.isApproved) {
 		try {
-			let answer = await Notification.changeRequestGenerator(postId, payload, senderInfo);
+			const posterUpdated = await AccommodationPost.findOneAndUpdate(
+				{ _id: req.params.accommodationPostId },
+				{ ...posterChangeInfomation }
+			);
+			const facilityUpdated = await MaterialFacilities.findOneAndUpdate(
+				{ _id: poster.materialFacilities },
+				{ ...materialFacilitiesChangeInfomation }
+			);
 			let response = {
 				request: {
 					type: 'GET',
@@ -93,9 +102,9 @@ module.exports.requestUpdatePostById = async (req, res, next) => {
 			res.status(200).json(response);
 		} catch (error) {
 			console.log(error);
-			res.status(400).json(error);
+			res.status(400).json({ message: 'fail to update' });
 		}
 	} else {
-		res.status(400).json({ message: RESPONSE_MESSAGE.ERROR });
+		res.status(400).json({ message: 'this poster is already approved' });
 	}
 };

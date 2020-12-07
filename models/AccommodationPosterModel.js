@@ -17,6 +17,10 @@ const postAccommodationSchema = mongoose.Schema({
 		type: String,
 		required: true
 	},
+	subDistrict: {
+		type: String,
+		required: true
+	},
 	address: {
 		type: String,
 		required: true
@@ -94,7 +98,7 @@ postAccommodationSchema.statics.generateAccommodationPoster = async function(inf
 		materialFacilities: materialFacilities._id
 	});
 	const notification = await Notification.approvalNotificationGenerator(senderId, senderName);
-	const listSaving = [ post, rating, materialFacilities, notification ];
+	const listSaving = [ rating, materialFacilities, notification, post ];
 	return Promise.all(listSaving.map((doc) => doc.save()));
 };
 

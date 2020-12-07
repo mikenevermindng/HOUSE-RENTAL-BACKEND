@@ -52,17 +52,6 @@ notificationSchema.statics.approvalNotificationGenerator = async function(sender
 	});
 };
 
-notificationSchema.statics.changeRequestGenerator = async function(postId, payload, senderInfo) {
-	return new this({
-		senderName: senderInfo.senderName,
-		content: ' yêu cầu thay đổi thông tin cho thuê nhà',
-		senderId: senderInfo.senderId,
-		isSentToAdmin: true,
-		payload: { ...payload, postId: postId },
-		code: POST_NOTIFICATION_CODE.CHANGE_REQUEST
-	}).save();
-};
-
 notificationSchema.statics.answerRequestNotificationGenerator = async function(recieverId, postId, isApproved) {
 	return new this({
 		senderName: 'Admin',

@@ -7,19 +7,19 @@ const multer = require('multer');
 
 // connect mongoDB
 mongoose
-  .connect(process.env.URI, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  })
-  .then((res) => {
-    console.log("connected");
-  })
-  .catch((error) => {
-    console.log(error);
-    console.log("can not connect database");
-  });
+	.connect(process.env.URI, {
+		useUnifiedTopology: true,
+		useNewUrlParser: true,
+		useCreateIndex: true,
+		useFindAndModify: false
+	})
+	.then((res) => {
+		console.log('connected');
+	})
+	.catch((error) => {
+		console.log(error);
+		console.log('can not connect database');
+	});
 
 // express config
 const express = require('express');
@@ -28,7 +28,7 @@ const port = process.env.PORT || 3001;
 
 // admin place
 const adminRouter = require('./routers/adminRouter');
-app.use("/admin", adminRouter);
+app.use('/admin', adminRouter);
 
 // config third party moudules
 app.use(cors());
@@ -38,34 +38,28 @@ app.use('/uploads', express.static('uploads'));
 
 // import router
 const commentRouter = require('./routers/commentRouter');
-const postAccommodationRouter = require("./routers/accomodationPostRouter");
-const ratingRouter = require("./routers/ratingRouter");
-const userRouter = require("./routers/usersRouter");
-const ownerRouter = require("./routers/ownerRouter");
-
-
+const postAccommodationRouter = require('./routers/accomodationPostRouter');
+const ratingRouter = require('./routers/ratingRouter');
+const userRouter = require('./routers/usersRouter');
+const ownerRouter = require('./routers/ownerRouter');
+const locationRouter = require('./routers/locationRouter');
 
 // Router place
-app.use("/accommodationPost", postAccommodationRouter);
-app.use("/rating", ratingRouter);
-app.use("/user", userRouter);
-app.use("/owner", ownerRouter);
+app.use('/accommodationPost', postAccommodationRouter);
+app.use('/rating', ratingRouter);
+app.use('/user', userRouter);
+app.use('/owner', ownerRouter);
 app.use('/comment', commentRouter);
+app.use('/location', locationRouter);
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Header",
-    "Origin, X-Requested-With",
-    "Content-Type",
-    "Accept",
-    "Authorization"
-  );
-  if (req.method === "OPTIONS") {
-    req.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
-    return res.status(200).json({});
-  }
-  next();
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Header', 'Origin, X-Requested-With', 'Content-Type', 'Accept', 'Authorization');
+	if (req.method === 'OPTIONS') {
+		req.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+		return res.status(200).json({});
+	}
+	next();
 });
 
 // Router config place

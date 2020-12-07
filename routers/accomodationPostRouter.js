@@ -18,7 +18,7 @@ route.get('/', controller.index);
 
 route.get('/:accommodationPostId', controller.getPostById);
 
-route.post('/:accommodationPostId', controller.requestUpdatePostById);
+route.put('/:accommodationPostId', controller.requestUpdatePostById);
 
 route.post('/', upload.array('image', 12), controller.generateAccommodationPoster);
 
