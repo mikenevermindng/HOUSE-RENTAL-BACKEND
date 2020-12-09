@@ -27,7 +27,7 @@ const postAccommodationSchema = mongoose.Schema({
 	},
 	searchingKeyWord: [ String ],
 	typeOfAccommodation: {
-		type: String,
+		type: String,	
 		enum: [ 'phòng trọ', 'chung cư mini', 'nhà nguyên căn', 'chung cư nguyên căn' ],
 		required: true
 	},
