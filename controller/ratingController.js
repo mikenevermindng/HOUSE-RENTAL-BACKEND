@@ -4,13 +4,12 @@ require('mongoose').mongo.ObjectID;
 module.exports.likeHandler = async (req, res, next) => {
 	const userId = req.body.userId;
 	const ratingId = req.params.ratingId;
-	const messageDetail = {};
 	try {
 		const accessingRating = await Rating.findById(ratingId);
 		const index = accessingRating.likedUser.findIndex((userIdInList) => userIdInList.toString() === userId);
 		if (index === -1) {
 			accessingRating.likedUser.push(userId);
-			messageDetail = await accessingRating.save();
+			const messageDetail = await accessingRating.save();
 			res.status(200).json({ message: 'success', detail: messageDetail });
 		} else {
 			res.status(401).json({ message: 'user liked', detail: messageDetail });
@@ -36,6 +35,7 @@ module.exports.unlikeHandler = async (req, res, next) => {
 			res.status(400).json({ message: 'fail' });
 		}
 	} catch (error) {
+		console.log(error)
 		res.status(400).json({ message: 'error' });
 	}
 };
@@ -57,18 +57,21 @@ module.exports.visitHandler = async (req, res, next) => {
 			res.status(400).json({ message: 'fail' });
 		}
 	} catch (error) {
+		console.log(error)
 		res.status(400).json({ message: 'error' });
 	}
 };
 
 module.exports.ratingHandler = async (req, res, next) => {
 	const ratingId = req.params.ratingId;
-	const { userId, stars } = req.body;
-	const message = {};
+	const { userId, stars, comment, username } = req.body;
+	console.log(username)
 	const rateInfo = {
 		time: Date.now(),
 		stars: stars,
-		userId: userId
+		userId: userId,
+		comment: comment,
+		username: username
 	};
 	try {
 		const accessingRating = await Rating.findById(ratingId);
@@ -82,6 +85,39 @@ module.exports.ratingHandler = async (req, res, next) => {
 		res.status(200).json({ message: message });
 		return;
 	} catch (error) {
+		console.log(error)
 		res.status(400).json({ message: 'error' });
 	}
 };
+
+module.exports.approvedRatingComment = async (req, res, next) => {
+	try {
+		const ratingId = req.params.ratingId;
+		const { ratedTimeId } = req.body;
+		const rating = await Rating.findById(ratingId)
+		const comment = rating.ratedTime.find(time => time._id.equals(ratedTimeId))
+		if (!comment) return res.status(404).json({ message: 'not found' });
+		comment.isApproved = true
+		const saved = await rating.save()
+		res.status(200).json({ message: 'success', saved: saved });
+	} catch (error) {
+		console.log(error)
+		res.status(400).json({ message: 'error' });
+	}
+}
+
+module.exports.deleteRatingComment = async (req, res, next) => {
+	try {
+		const ratingId = req.params.ratingId;
+		const { ratedTimeId } = req.body;
+		const deleted = await Rating.findByIdAndUpdate(ratingId, {
+			$pull: {
+				ratedTime: { _id: ratedTimeId }
+			}
+		})
+		res.status(200).json({ message: 'success', deleted: deleted });
+	} catch (error) {
+		console.log(error)
+		res.status(400).json({ message: 'error' });
+	}
+}

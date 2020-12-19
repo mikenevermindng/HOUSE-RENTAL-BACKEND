@@ -12,16 +12,21 @@ module.exports.getComment = async (req, res, next) => {
 
 module.exports.generateComment = async (req, res, next) => {
 	try {
-		const newComment = new Comment({
-			...req.body
-		});
-		await newComment.save();
-		const response = {
-			request: 'GET',
-			description: 'GET post',
-			url: 'http://localhost:3001/comment/' + newComment._id
-		};
-		res.status(200).json(response);
+		const { ratingId, userId, comment, stars } = req.body
+		const trackingComment = await Comment.findOne({ ratingId, userId })
+		if (!trackingComment) {
+			const newComment = new Comment({
+				...req.body
+			});
+			await newComment.save();
+			return res.status(200).json({ comment: comment, message: 'set new comment' })
+		} else {
+			trackingComment.comment = comment
+			trackingComment.stars = stars
+			trackingComment.isApproved = false
+			const saved = await trackingComment.save()
+			return res.status(200).json({ updated: saved, message: 'update comment' })
+		}
 	} catch (error) {
 		console.log(error);
 		res.status(400).json({ message: 'error', detail: error });
@@ -31,13 +36,12 @@ module.exports.generateComment = async (req, res, next) => {
 module.exports.approvedComment = async (req, res, next) => {
 	try {
 		const commentId = req.params.commentId;
-		const comment = await Comment.findById(commentId);
-		comment.isApproved = true;
-		await comment.save();
+		const comment = await Comment.findOne({ _id: commentId });
+		comment.isApproved = true
+		const saved = await comment.save()
 		const response = {
-			request: 'GET',
-			description: 'GET post',
-			url: 'http://localhost:3001/comment/' + comment._id
+			message: 'success',
+			saved: saved
 		};
 		res.status(200).json(response);
 	} catch (error) {

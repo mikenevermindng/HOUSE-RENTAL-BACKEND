@@ -9,31 +9,45 @@ const ratingSchema = mongoose.Schema({
 	},
 	ratedTime: [
 		{
-			time: Date,
+			time: {
+				type: Date,
+				default: Date.now()
+			},
 			stars: {
 				type: Number,
-				min: 1,
+				min: 0.5,
 				max: 5,
 				required: true
 			},
 			userId: {
 				type: mongoose.Schema.Types.ObjectId,
 				required: true
+			},
+			username: {
+				type: String,
+				required: true
+			},
+			comment: {
+				type: String,
+			},
+			isApproved: {
+				type: Boolean,
+				default: false
 			}
 		}
 	],
-	likedUser: [ mongoose.Schema.Types.ObjectId ],
-	visits: [ Date ]
+	likedUser: [mongoose.Schema.Types.ObjectId],
+	visits: [Date]
 });
 
-ratingSchema.pre('save', function(next) {
-	this.rate = this.ratedTime.reduce((total, time) => {
+ratingSchema.pre('save', function (next) {
+	this.rate = this.ratedTime.filter(rate => rate.isApproved).reduce((total, time) => {
 		return total + time.stars / this.ratedTime.length;
 	}, 0);
 	next();
 });
 
-ratingSchema.pre('post', function(next) {
+ratingSchema.pre('post', function (next) {
 	this.rate = this.ratedTime.reduce((total, time) => {
 		return total + time.stars / this.ratedTime.length;
 	}, 0);

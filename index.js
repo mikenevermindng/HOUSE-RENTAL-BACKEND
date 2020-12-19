@@ -17,7 +17,6 @@ mongoose
 		console.log('connected');
 	})
 	.catch((error) => {
-		console.log(error);
 		console.log('can not connect database');
 	});
 
@@ -27,8 +26,8 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 // admin place
-const adminRouter = require('./routers/adminRouter');
-app.use('/admin', adminRouter);
+// const adminRouter = require('./routers/adminRouter');
+// app.use('/admin', adminRouter);
 
 // config third party moudules
 app.use(cors());
@@ -43,6 +42,8 @@ const ratingRouter = require('./routers/ratingRouter');
 const userRouter = require('./routers/usersRouter');
 const ownerRouter = require('./routers/ownerRouter');
 const locationRouter = require('./routers/locationRouter');
+const rentalRequestRouter = require('./routers/rentalRequestRouter')
+const searchingRecordRouter = require('./routers/seachingRecordRouter')
 
 // Router place
 app.use('/accommodationPost', postAccommodationRouter);
@@ -51,6 +52,8 @@ app.use('/user', userRouter);
 app.use('/owner', ownerRouter);
 app.use('/comment', commentRouter);
 app.use('/location', locationRouter);
+app.use('/rental-request', rentalRequestRouter)
+app.use('/searching-record', searchingRecordRouter)
 
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');

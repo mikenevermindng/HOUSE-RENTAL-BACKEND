@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const materialFacilitiesSchema = mongoose.Schema({
 	bathroom: {
 		type: String,
-		unum: [ 'closed', 'shared' ],
+		unum: ['khép kín', 'chia sẻ'],
 		required: true
 	},
 	electricWaterHeater: {
@@ -12,7 +12,7 @@ const materialFacilitiesSchema = mongoose.Schema({
 	},
 	kitchen: {
 		type: String,
-		unum: [ 'closed', 'shared', 'none' ],
+		unum: ['khép kín', 'chia sẻ', 'không'],
 		required: true
 	},
 	airConditioner: {
@@ -23,6 +23,22 @@ const materialFacilitiesSchema = mongoose.Schema({
 		type: Boolean,
 		required: true
 	},
+	bed: {
+		type: Boolean,
+		require: true
+	},
+	fridge: {
+		type: Boolean,
+		require: true
+	},
+	washingMachine: {
+		type: Boolean,
+		require: true
+	},
+	wardrobe: {
+		type: Boolean,
+		require: true
+	},
 	electricityPrice: {
 		type: Number,
 		required: true
@@ -31,7 +47,7 @@ const materialFacilitiesSchema = mongoose.Schema({
 		type: Number,
 		required: true
 	},
-	other: [ {} ]
+	other: [{}]
 });
 
 module.exports = mongoose.model('facilities', materialFacilitiesSchema);

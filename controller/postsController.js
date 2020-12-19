@@ -25,7 +25,8 @@ module.exports.index = async (req, res, next) => {
 
 module.exports.generateAccommodationPoster = async (req, res, next) => {
 	try {
-		const generateMessage = AccommodationPost.generateAccommodationPoster(req.body);
+		const images = req.files
+		const generateMessage = AccommodationPost.generateAccommodationPoster(req.body, images);
 		const response = {
 			message: 'success',
 			request: {

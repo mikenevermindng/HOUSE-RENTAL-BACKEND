@@ -7,6 +7,10 @@ route.patch('/unlike/:ratingId', controller.unlikeHandler)
 
 route.patch('/visit/:ratingId', controller.visitHandler)
 
-route.patch('/rating/:ratingId', controller.ratingHandler)
+route.patch('/:ratingId', controller.ratingHandler)
+
+route.patch('/approved/:ratingId', controller.approvedRatingComment)
+
+route.delete('/:ratingId', controller.deleteRatingComment)
 
 module.exports = route;
