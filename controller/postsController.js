@@ -5,7 +5,7 @@ const Notification = require('../models/NotificationModel');
 const { RESPONSE_MESSAGE } = require('../Constants/MessageConstants');
 
 module.exports.index = async (req, res, next) => {
-	const filterOption = req.body.filterOption;
+	const { filterOption } = req.body;
 	try {
 		const accommodationPosts = await AccommodationPost.find(filterOption).populate('rating materialFacilities');
 		const response = {
@@ -22,6 +22,25 @@ module.exports.index = async (req, res, next) => {
 		return;
 	}
 };
+
+module.exports.getPosterByOwnerId = async (req, res, next) => {
+	const { ownerId } = req.params
+	try {
+		const accommodationPosts = await AccommodationPost.find({ ownerId }).populate('rating materialFacilities');
+		const response = {
+			count: accommodationPosts.length,
+			posts: accommodationPosts
+		};
+		res.status(200).json(response);
+		return;
+	} catch (error) {
+		console.log(error);
+		res.status(404).json({
+			error: error
+		});
+		return;
+	}
+}
 
 module.exports.generateAccommodationPoster = async (req, res, next) => {
 	try {
@@ -45,7 +64,12 @@ module.exports.generateAccommodationPoster = async (req, res, next) => {
 module.exports.getPostById = async (req, res, next) => {
 	const id = req.params.accommodationPostId;
 	try {
+
 		let reqPost = await AccommodationPost.findById(id).populate('rating materialFacilities');
+		const updateMessage = await Rating.findOneAndUpdate(
+			{ _id: reqPost.rating._id },
+			{ $push: { visits: Date.now() } }
+		);
 		let response = {
 			post: reqPost,
 			request: {
@@ -56,6 +80,7 @@ module.exports.getPostById = async (req, res, next) => {
 		};
 		res.status(200).json(response);
 	} catch (err) {
+		console.log(err)
 		res.status(404).json({ message: 'No valid entry found for provided ID' });
 	}
 };

@@ -16,6 +16,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 route.get('/', recordingMiddleware.saveRequest, controller.index);
 
+route.get('/getWithFilterOptions/:ownerId', controller.getPosterByOwnerId);
+
 route.get('/:accommodationPostId', controller.getPostById);
 
 route.put('/:accommodationPostId', controller.requestUpdatePostById);

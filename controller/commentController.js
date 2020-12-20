@@ -1,5 +1,15 @@
 const Comment = require('../models/CommentModel');
 
+module.exports.getAllComments = async (req, res, next) => {
+	try {
+		const { filterOption } = req.body
+		const comments = await Comment.find({ ...filterOption });
+		res.status(200).json({ count: comments.length, comment: comments });
+	} catch (err) {
+		res.status(400).json({ message: 'error' });
+	}
+}
+
 module.exports.getComment = async (req, res, next) => {
 	try {
 		const commentId = req.params.commentId;
@@ -10,6 +20,28 @@ module.exports.getComment = async (req, res, next) => {
 	}
 };
 
+module.exports.getPosterCommnet = async (req, res, next) => {
+	try {
+		const { posterId } = req.params
+		const comments = await Comment.find({ postId: posterId, isApproved: true })
+		res.status(200).json({ count: comments.length, comments: comments })
+	} catch (err) {
+		console.log(err)
+		res.status(400).json({ message: 'error' });
+	}
+}
+
+module.exports.getRatingComment = async (req, res, next) => {
+	try {
+		const { ratingId } = req.params
+		const comments = await Comment.find({ ratingId: ratingId })
+		res.status(200).json({ count: comments.length, comments: comments })
+	} catch (err) {
+		console.log(err)
+		res.status(400).json({ message: 'error' });
+	}
+}
+
 module.exports.generateComment = async (req, res, next) => {
 	try {
 		const { ratingId, userId, comment, stars } = req.body
@@ -19,7 +51,7 @@ module.exports.generateComment = async (req, res, next) => {
 				...req.body
 			});
 			await newComment.save();
-			return res.status(200).json({ comment: comment, message: 'set new comment' })
+			return res.status(200).json({ comment: newComment, message: 'set new comment' })
 		} else {
 			trackingComment.comment = comment
 			trackingComment.stars = stars

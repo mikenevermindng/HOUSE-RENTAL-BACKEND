@@ -11,13 +11,15 @@ const renterSchema = mongoose.Schema({
 		unique: true,
 		match: /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
 	},
+	phoneNumber: {
+		type: String,
+		required: true,
+		match: /^[0-9]{10}$/
+	},
 	password: {
 		type: String,
 		required: true,
 		min: 8
-	},
-	follow: {
-		type: [ mongoose.Schema.Types.ObjectId ]
 	}
 });
 

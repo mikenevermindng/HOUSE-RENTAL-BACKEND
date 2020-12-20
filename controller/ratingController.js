@@ -6,13 +6,13 @@ module.exports.likeHandler = async (req, res, next) => {
 	const ratingId = req.params.ratingId;
 	try {
 		const accessingRating = await Rating.findById(ratingId);
-		const index = accessingRating.likedUser.findIndex((userIdInList) => userIdInList.toString() === userId);
+		const index = accessingRating.likedUser.findIndex((userIdInList) => userIdInList.userId.toString() === userId);
 		if (index === -1) {
-			accessingRating.likedUser.push(userId);
+			accessingRating.likedUser.push({ userId: userId });
 			const messageDetail = await accessingRating.save();
 			res.status(200).json({ message: 'success', detail: messageDetail });
 		} else {
-			res.status(401).json({ message: 'user liked', detail: messageDetail });
+			res.status(401).json({ message: 'user liked' });
 		}
 	} catch (error) {
 		console.log(error);
@@ -24,7 +24,7 @@ module.exports.unlikeHandler = async (req, res, next) => {
 	const userId = req.body.userId;
 	const ratingId = req.params.ratingId;
 	try {
-		const updateMessage = await Rating.findOneAndUpdate({ _id: ratingId }, { $pull: { likedUser: userId } }).exec();
+		const updateMessage = await Rating.findOneAndUpdate({ _id: ratingId }, { $pull: { likedUser: { userId: userId } } }).exec();
 		if (updateMessage) {
 			const response = {
 				message: 'success',

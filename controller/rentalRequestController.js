@@ -2,7 +2,7 @@ const RentalRequest = require('../models/RentalRequest')
 
 module.exports.getAllRequest = async (req, res, next) => {
     try {
-        const rentalRequests = await RentalRequest.find()
+        const rentalRequests = await RentalRequest.find().populate('posterId', 'city district subDistrict')
         res.status(200).json({
             requests: rentalRequests,
             message: 'success'
@@ -18,7 +18,7 @@ module.exports.getAllRequest = async (req, res, next) => {
 module.exports.getRequestToOwner = async (req, res, next) => {
     try {
         const { ownerId } = req.params
-        const rentalRequests = await RentalRequest.find({ ownerId: ownerId })
+        const rentalRequests = await RentalRequest.find({ ownerId: ownerId }).populate('posterId userId', 'title username')
         res.status(200).json({
             requests: rentalRequests,
             message: 'success'
