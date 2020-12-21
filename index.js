@@ -1,9 +1,9 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const multer = require('multer');
+require("dotenv").config();
+const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const multer = require("multer");
 
 // connect mongoDB
 mongoose
@@ -22,7 +22,7 @@ mongoose
   });
 
 // express config
-const express = require('express');
+const express = require("express");
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -32,23 +32,22 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use('/uploads', express.static('uploads'));
+app.use("/uploads", express.static("uploads"));
 
 // import router
-const commentRouter = require('./routers/commentRouter');
+const commentRouter = require("./routers/commentRouter");
 const postAccommodationRouter = require("./routers/accomodationPostRouter");
 const ratingRouter = require("./routers/ratingRouter");
 const userRouter = require("./routers/usersRouter");
 const ownerRouter = require("./routers/ownerRouter");
-const adminRouter = require('./routers/adminRouter');
-
+const adminRouter = require("./routers/adminRouter");
 // Router place
 app.use("/accommodationPost", postAccommodationRouter);
 app.use("/rating", ratingRouter);
 app.use("/user", userRouter);
 app.use("/owner", ownerRouter);
 app.use("/admin", adminRouter);
-app.use('/comment', commentRouter);
+app.use("/comment", commentRouter);
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -69,20 +68,20 @@ app.use((req, res, next) => {
 // Router config place
 
 app.use((req, res, next) => {
-	const error = new Error('Not found');
-	error.status = 404;
-	next(error);
+  const error = new Error("Not found");
+  error.status = 404;
+  next(error);
 });
 
 app.use((error, req, res, next) => {
-	res.status(error.status || 500);
-	res.json({
-		error: {
-			message: error.message
-		}
-	});
+  res.status(error.status || 500);
+  res.json({
+    error: {
+      message: error.message,
+    },
+  });
 });
 
 app.listen(port, () => {
-	console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`Example app listening at http://localhost:${port}`);
 });
