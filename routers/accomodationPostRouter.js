@@ -16,11 +16,13 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-route.get('/', recordingMiddleware.saveRequest, controller.index);
+route.get('/', controller.index);
 
 route.get('/getWithFilterOptions/', verifyToken, isOwner, controller.getPosterByOwnerId);
 
-route.post('/userGetPoster', controller.getPosterForuser)
+route.post('/userGetPoster', recordingMiddleware.saveRequest, controller.getPosterForuser)
+
+route.get('/getFavoritesPoster/', verifyToken, isUser, controller.getFavoritesPoster)
 
 route.get('/:accommodationPostId', controller.getPostById);
 
@@ -32,7 +34,7 @@ route.patch('/updateStatus/:accommodationPostId', verifyToken, isOwner, controll
 
 route.post('/', verifyToken, isOwner, controller.generateAccommodationPoster);
 
-route.delete('/:accommodationPostId', controller.deletePostById);
+route.delete('/:accommodationPostId', verifyToken, isAdmin, controller.deletePostById);
 
 route.post('/imageUploader', upload.array('images', 12), (req, res) => {
 	res.status(200).json({ files: req.files });

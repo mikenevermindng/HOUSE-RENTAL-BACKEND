@@ -41,7 +41,7 @@ module.exports.generateRentalRequest = async (req, res, next) => {
         const userId = _id
         const { ownerId, posterId, numberOfPeople } = req.body
         console.log(userId)
-        const requestByThisUser = await RentalRequest.findOne({ userId: userId })
+        const requestByThisUser = await RentalRequest.findOne({ userId: userId, posterId: posterId })
         if (requestByThisUser) {
             return res.status(200).json({ message: 'Bạn đã từng đăng kí thuê bất động sản này mà chưa được phê duyệt, vui lòng xóa yêu cầu cũ đi' })
         }

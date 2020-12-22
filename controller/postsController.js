@@ -3,6 +3,7 @@ const MaterialFacilities = require('../models/MaterialFacilitiesModel');
 const Rating = require('../models/RatingModel');
 const Notification = require('../models/NotificationModel');
 const { RESPONSE_MESSAGE } = require('../Constants/MessageConstants');
+const mongoose = require('mongoose')
 
 module.exports.index = async (req, res, next) => {
 	const { filterOption } = req.body;
@@ -25,12 +26,12 @@ module.exports.index = async (req, res, next) => {
 
 module.exports.getPosterForuser = async (req, res, next) => {
 	try {
-		const { city, district, subDistrict, typeOfAccommodation, minArea, maxArea, minPrice, maxPrice } = req.body
+		const { filterData, page, perPage } = req.body
+		const { city, district, subDistrict, typeOfAccommodation, minArea, maxArea, minPrice, maxPrice } = filterData
 		const filterOption = Object.entries({
 			city, district, subDistrict, typeOfAccommodation
 		}).reduce((a, [k, v]) => (v == null ? a : (a[k] = v, a)), {})
-		console.log(filterOption)
-		const accommodationPosts = await AccommodationPost.find({ isApproved: true, ...filterOption }).populate('rating materialFacilities');
+		const accommodationPosts = await AccommodationPost.find({ isApproved: true, status: 'available', ...filterOption }).populate('rating materialFacilities').skip(page * perPage).limit(perPage);
 		const filterAccommodationPoster = accommodationPosts.filter(accommod => {
 			let filterMinPrice = true
 			let filterMaxPrice = true
@@ -84,6 +85,25 @@ module.exports.getPosterByOwnerId = async (req, res, next) => {
 		});
 		return;
 	}
+}
+
+module.exports.getFavoritesPoster = async (req, res, next) => {
+	const { _id } = req.userData
+	console.log(_id)
+	try {
+		const posts = await AccommodationPost.find({}).populate('rating materialFacilities')
+		const filtedPoster = posts.filter(post => {
+			const { rating } = post
+			const { likedUser } = rating
+			// console.log(likedUser)
+			return likedUser.findIndex(user => user.userId.equals(_id)) !== -1
+		})
+		res.status(200).json({ message: 'success', posts: filtedPoster })
+	} catch (error) {
+		console.log(error)
+		res.status(400).json({ message: 'fail', posts: [] })
+	}
+
 }
 
 module.exports.generateAccommodationPoster = async (req, res, next) => {

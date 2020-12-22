@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 const ratingSchema = mongoose.Schema({
-	postId: mongoose.Schema.Types.ObjectId,
+	postId: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'accommodation_post'
+	},
 	rate: {
 		type: Number,
 		max: 5,

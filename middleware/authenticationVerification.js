@@ -1,4 +1,3 @@
-const jwt_decode = require('jwt-decode');
 const jwt = require('jsonwebtoken');
 const { ROLE } = require('../Constants/roleConstant')
 
@@ -35,7 +34,7 @@ const isOwner = (req, res, next) => {
 }
 
 const isAdmin = (req, res, next) => {
-    if (req.userData.role === ROLE.USER) {
+    if (req.userData.role === ROLE.ADMIN) {
         next()
     } else {
         return res.status(400).json({

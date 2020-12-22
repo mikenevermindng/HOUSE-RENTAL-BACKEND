@@ -4,12 +4,13 @@ const searchingRecordModel = mongoose.Schema({
     city: String,
     district: String,
     subDistrict: String,
-    rangePrice: [Number],
+    minPrice: Number,
+    maxPrice: Number,
+    typeOfAccommodation: String,
     requestTime: {
         type: Date,
         default: Date.now()
     },
-    numberOfroom: Number,
     area: Number,
 })
 

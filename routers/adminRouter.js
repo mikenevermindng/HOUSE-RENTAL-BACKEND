@@ -1,28 +1,16 @@
-const AdminBro = require('admin-bro');
-const AdminBroExpress = require('@admin-bro/express');
-const AdminBroMongoose = require('@admin-bro/mongoose');
-const mongoose = require('mongoose');
+const route = require('express').Router()
+const jwt = require('jsonwebtoken')
+const { ROLE } = require('../Constants/RoleConstant')
 
-AdminBro.registerAdapter(AdminBroMongoose);
-
-const adminBro = new AdminBro({
-	databases: [ mongoose ],
-	rootPath: '/admin'
-});
-
-const admin = {
-	email: process.env.ADMIN_EMAIL,
-	password: process.env.ADMIN_PASSWORD
-};
-const router = AdminBroExpress.buildAuthenticatedRouter(adminBro, {
-	cookieName: process.env.ADMIN_COOKIE_NAME,
-	cookiePassword: process.env.ADMIN_COOKIE_PASSWORD,
-	authenticate: async (email, password) => {
-		if (email === admin.email && password === admin.password) {
-			return admin;
-		}
-		return null;
+route.post("/", (req, res, next) => {
+	const { account, password } = req.body
+	if (account !== process.env.ADMIN_ACCOUNT || password !== process.env.ADMIN_PASSWORD) {
+		return res.status(401).json({ message: "fail to access as admin" })
+	} else {
+		const token = jwt.sign({ role: ROLE.ADMIN }, process.env.TOKEN_SECRET);
+		return res.status(200).json({ message: "accessed as admin successfully", token: "Bearer " + token })
 	}
-});
+})
 
-module.exports = router;
+
+module.exports = route;

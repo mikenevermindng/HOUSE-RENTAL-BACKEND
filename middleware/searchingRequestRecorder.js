@@ -3,11 +3,10 @@ const _ = require('lodash')
 
 module.exports.saveRequest = async (req, res, next) => {
     try {
-        const { filterOption } = req.body
-        if (_.isEmpty(filterOption)) {
+        if (_.isEmpty({ ...req.body })) {
             return next()
         }
-        const newRequest = new SearchingRecord({ ...filterOption })
+        const newRequest = new SearchingRecord({ ...req.body })
         await newRequest.save()
         next()
     } catch (error) {

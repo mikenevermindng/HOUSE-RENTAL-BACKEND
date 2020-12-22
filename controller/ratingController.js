@@ -2,7 +2,7 @@ const Rating = require('../models/RatingModel');
 require('mongoose').mongo.ObjectID;
 
 module.exports.likeHandler = async (req, res, next) => {
-	const userId = req.body.userId;
+	const userId = req.userData._id;
 	const ratingId = req.params.ratingId;
 	try {
 		const accessingRating = await Rating.findById(ratingId);
@@ -21,7 +21,7 @@ module.exports.likeHandler = async (req, res, next) => {
 };
 
 module.exports.unlikeHandler = async (req, res, next) => {
-	const userId = req.body.userId;
+	const userId = req.userData._id;
 	const ratingId = req.params.ratingId;
 	try {
 		const updateMessage = await Rating.findOneAndUpdate({ _id: ratingId }, { $pull: { likedUser: { userId: userId } } }).exec();
