@@ -23,8 +23,52 @@ module.exports.index = async (req, res, next) => {
 	}
 };
 
+module.exports.getPosterForuser = async (req, res, next) => {
+	try {
+		const { city, district, subDistrict, typeOfAccommodation, minArea, maxArea, minPrice, maxPrice } = req.body
+		const filterOption = Object.entries({
+			city, district, subDistrict, typeOfAccommodation
+		}).reduce((a, [k, v]) => (v == null ? a : (a[k] = v, a)), {})
+		console.log(filterOption)
+		const accommodationPosts = await AccommodationPost.find({ isApproved: true, ...filterOption }).populate('rating materialFacilities');
+		const filterAccommodationPoster = accommodationPosts.filter(accommod => {
+			let filterMinPrice = true
+			let filterMaxPrice = true
+			let filterMinArea = true
+			let filterMaxArea = true
+			if (minPrice) {
+				filterMinPrice = accommod.pricePerMonth > minPrice
+			}
+			if (maxPrice) {
+				filterMaxPrice = accommod.pricePerMonth < maxPrice
+			}
+			if (minArea) {
+				filterMinArea = accommod.area > minArea
+			}
+			if (maxArea) {
+				filterMaxArea = accommod.area < maxArea
+			}
+			return filterMinPrice && filterMaxPrice && filterMinArea && filterMaxArea
+		})
+
+		const response = {
+			count: filterAccommodationPoster.length,
+			posts: filterAccommodationPoster
+		};
+		res.status(200).json(response);
+		return;
+	} catch (error) {
+		console.log(error);
+		res.status(404).json({
+			error: error
+		});
+		return;
+	}
+}
+
 module.exports.getPosterByOwnerId = async (req, res, next) => {
-	const { ownerId } = req.params
+	const { _id } = req.userData
+	const ownerId = _id
 	try {
 		const accommodationPosts = await AccommodationPost.find({ ownerId }).populate('rating materialFacilities');
 		const response = {
@@ -45,7 +89,8 @@ module.exports.getPosterByOwnerId = async (req, res, next) => {
 module.exports.generateAccommodationPoster = async (req, res, next) => {
 	try {
 		const images = req.files
-		const generateMessage = AccommodationPost.generateAccommodationPoster(req.body, images);
+		const { _id, firstName, lastName } = req.userData
+		const generateMessage = AccommodationPost.generateAccommodationPoster(req.body, _id, firstName, lastName);
 		const response = {
 			message: 'success',
 			request: {
@@ -103,9 +148,10 @@ module.exports.deletePostById = async (req, res, next) => {
 
 module.exports.requestUpdatePostById = async (req, res, next) => {
 	const postId = req.params.accommodationPostId;
-	const { senderId, posterChangeInfomation, materialFacilitiesChangeInfomation } = req.body;
+	const ownerId = req.userData._id
+	const { posterChangeInfomation, materialFacilitiesChangeInfomation } = req.body;
 	const poster = await AccommodationPost.findById(postId);
-	if (poster.ownerId.toString() !== senderId) {
+	if (poster.ownerId.toString() !== ownerId) {
 		return res.status(400).json({ message: 'you are not the owner of this poster' });
 	}
 	if (!poster.isApproved) {
@@ -134,3 +180,31 @@ module.exports.requestUpdatePostById = async (req, res, next) => {
 		res.status(400).json({ message: 'this poster is already approved' });
 	}
 };
+
+module.exports.approvedPoster = async (req, res, next) => {
+	try {
+		const { accommodationPostId } = req.params
+		const updated = await AccommodationPost.findOneAndUpdate(
+			{ _id: accommodationPostId },
+			{ isApproved: true }
+		);
+		res.status(200).json({ message: "approved" })
+	} catch (error) {
+		console.log(error)
+		res.status(400).json({ message: "fail to approve" })
+	}
+}
+
+module.exports.updateStatus = async (req, res, next) => {
+	try {
+		const { accommodationPostId } = req.params
+		const updated = await AccommodationPost.findOneAndUpdate(
+			{ _id: accommodationPostId },
+			{ status: req.body.status }
+		);
+		res.status(200).json({ message: "approved" })
+	} catch (error) {
+		console.log(error)
+		res.status(400).json({ message: "fail to approve" })
+	}
+}

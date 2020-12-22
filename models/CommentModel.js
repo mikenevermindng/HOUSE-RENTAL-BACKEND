@@ -37,25 +37,5 @@ const commentSchema = mongoose.Schema({
 	}
 });
 
-commentSchema.pre('save', async function (next) {
-	const Comment = mongoose.model('comment', commentSchema);
-	const comments = await Comment.find({ ratingId: this.ratingId, isApproved: true })
-	let rate = comments.reduce((total, time) => {
-		return total + time.stars / comments.length;
-	}, 0)
-	const updated = await Rating.findOneAndUpdate({ _id: this.ratingId }, { rate: rate })
-	next();
-});
-
-commentSchema.pre('post', async function (next) {
-	const Comment = mongoose.model('comment', commentSchema);
-	const comments = await Comment.find({ ratingId: this.ratingId, isApproved: true })
-	let rate = comments.reduce((total, time) => {
-		return total + time.stars / (comments.length);
-	}, 0)
-	const updated = await Rating.findOneAndUpdate({ _id: this.ratingId }, { rate: rate })
-	next();
-});
-
 
 module.exports = mongoose.model('comment', commentSchema);

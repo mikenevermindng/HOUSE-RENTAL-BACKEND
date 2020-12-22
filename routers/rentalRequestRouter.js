@@ -1,12 +1,14 @@
 const route = require('express').Router()
 const controller = require('../controller/rentalRequestController')
 
-route.get('/', controller.getAllRequest)
+const { verifyToken, isOwner, isAdmin, isUser } = require('../middleware/authenticationVerification')
 
-route.get('/:ownerId', controller.getRequestToOwner)
+route.get('/', verifyToken, isAdmin, controller.getAllRequest)
 
-route.post('/', controller.generateRentalRequest)
+route.get('/ownerRequest', verifyToken, isOwner, controller.getRequestToOwner)
 
-route.delete('/:rentalRequestId', controller.deleteRentalRequest)
+route.post('/', verifyToken, isUser, controller.generateRentalRequest)
+
+route.delete('/:rentalRequestId', verifyToken, isOwner, controller.deleteRentalRequest)
 
 module.exports = route

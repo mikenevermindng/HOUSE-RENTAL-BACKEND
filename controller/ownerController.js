@@ -46,7 +46,7 @@ module.exports.login = async (req, res, next) => {
 
     //Create and assign a token 
     const { ownerId } = req.params;
-    const token = jwt.sign({ _id: ownerId, role: ROLE.OWNER }, process.env.TOKEN_SECRET);
+    const token = jwt.sign({ role: ROLE.OWNER, ...owner._doc, password: '' }, process.env.TOKEN_SECRET);
     res.status(200).json({
       owner: { ...owner._doc, password: '' },
       token: 'Bearer ' + token,
@@ -81,10 +81,7 @@ module.exports.deleteOwner = async (req, res, next) => {
 module.exports.updateAccount = async (req, res, next) => {
   try {
     const { ownerId } = req.params;
-
-    const hashPassword = await bcrypt.hash(password, saltRounds);
-    const owner = await Owners.findOneAndUpdate({ _id: ownerId }, { ...req.body, password: hashPassword });
-    //Update Password
+    const owner = await Owners.findOneAndUpdate({ _id: ownerId }, { ...req.body });
     res.json({
       message: "updated successfully",
     });

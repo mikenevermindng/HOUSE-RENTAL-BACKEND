@@ -45,7 +45,7 @@ module.exports.login = async (req, res, next) => {
     }
 
     //Create and assign a token
-    const token = jwt.sign({ userId: user._id, role: ROLE.USER }, process.env.TOKEN_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ role: ROLE.USER, ...user._doc, password: "" }, process.env.TOKEN_SECRET, { expiresIn: '1h' });
     res.status(200).json({
       user: { ...user._doc, password: "" },
       token: 'Bearer ' + token

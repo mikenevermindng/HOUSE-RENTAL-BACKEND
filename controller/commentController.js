@@ -1,4 +1,5 @@
 const Comment = require('../models/CommentModel');
+const Rating = require('../models/RatingModel')
 
 module.exports.getAllComments = async (req, res, next) => {
 	try {
@@ -44,7 +45,9 @@ module.exports.getRatingComment = async (req, res, next) => {
 
 module.exports.generateComment = async (req, res, next) => {
 	try {
-		const { ratingId, userId, comment, stars } = req.body
+		const { ratingId, comment, stars } = req.body
+		const { _id } = req.userData
+		const userId = _id
 		const trackingComment = await Comment.findOne({ ratingId, userId })
 		if (!trackingComment) {
 			const newComment = new Comment({
@@ -71,9 +74,18 @@ module.exports.approvedComment = async (req, res, next) => {
 		const comment = await Comment.findOne({ _id: commentId });
 		comment.isApproved = true
 		const saved = await comment.save()
+		const comments = await Comment.find({ ratingId: comment.ratingId, isApproved: true })
+		let rateUpdated = comments.reduce((total, time) => {
+			return total + time.stars / (comments.length);
+		}, 0)
+		const rating = await Rating.findByIdAndUpdate(comment.ratingId, {
+			rate: rateUpdated
+		})
+
 		const response = {
 			message: 'success',
-			saved: saved
+			saved: saved,
+			rating: rating
 		};
 		res.status(200).json(response);
 	} catch (error) {

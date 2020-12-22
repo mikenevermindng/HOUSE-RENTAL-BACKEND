@@ -91,17 +91,17 @@ const postAccommodationSchema = mongoose.Schema({
 	}
 });
 
-postAccommodationSchema.statics.generateAccommodationPoster = async function (info) {
-	const { materialFacilitiesInfo, accommodationInfo, senderId, senderName } = info;
+postAccommodationSchema.statics.generateAccommodationPoster = async function (info, ownerId, firstName, lastNam) {
+	const { materialFacilitiesInfo, accommodationInfo } = info;
 	const materialFacilities = new MaterialFacilities(materialFacilitiesInfo);
 	const rating = new Rating();
 	const post = new this({
 		...accommodationInfo,
-		ownerId: rating._id,
+		ownerId: ownerId,
 		rating: rating._id,
 		materialFacilities: materialFacilities._id
 	});
-	const notification = await Notification.approvalNotificationGenerator(senderId, senderName);
+	const notification = await Notification.approvalNotificationGenerator(ownerId, firstName + lastNam);
 	const listSaving = [rating, materialFacilities, notification, post];
 	return Promise.all(listSaving.map((doc) => doc.save()));
 };

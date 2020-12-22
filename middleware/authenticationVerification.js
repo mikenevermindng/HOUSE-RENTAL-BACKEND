@@ -25,7 +25,7 @@ const verifyToken = (req, res, next) => {
 }
 
 const isOwner = (req, res, next) => {
-    if (req.userData.role === ROLE.USER) {
+    if (req.userData.role === ROLE.OWNER) {
         next()
     } else {
         return res.status(400).json({
@@ -35,7 +35,28 @@ const isOwner = (req, res, next) => {
 }
 
 const isAdmin = (req, res, next) => {
-    if (req.userData.role === ROLE.ADMIN) {
+    if (req.userData.role === ROLE.USER) {
+        next()
+    } else {
+        return res.status(400).json({
+            message: 'Access limited',
+        });
+    }
+}
+
+const isUser = (req, res, next) => {
+    if (req.userData.role === ROLE.USER) {
+        next()
+    } else {
+        return res.status(400).json({
+            message: 'Access limited',
+        });
+    }
+}
+
+const isOwnerOrAdmin = (req, res, next) => {
+    if (req.userData.role === ROLE.USER || req.userData.role === ROLE.ADMIN) {
+        req.role = req.userData.role
         next()
     } else {
         return res.status(400).json({
@@ -45,5 +66,5 @@ const isAdmin = (req, res, next) => {
 }
 
 module.exports = {
-    verifyToken, isOwner, isAdmin
+    verifyToken, isOwner, isAdmin, isUser, isOwnerOrAdmin
 }

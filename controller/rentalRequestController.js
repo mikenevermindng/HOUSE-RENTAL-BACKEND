@@ -17,8 +17,11 @@ module.exports.getAllRequest = async (req, res, next) => {
 
 module.exports.getRequestToOwner = async (req, res, next) => {
     try {
-        const { ownerId } = req.params
-        const rentalRequests = await RentalRequest.find({ ownerId: ownerId }).populate('posterId userId', 'title username')
+        const { _id } = req.userData
+        const ownerId = _id
+        console.log(ownerId)
+        const rentalRequests = await RentalRequest.find({ ownerId: ownerId }).populate('posterId userId', 'title username phoneNumber email')
+        console.log(rentalRequests)
         res.status(200).json({
             requests: rentalRequests,
             message: 'success'
@@ -33,12 +36,16 @@ module.exports.getRequestToOwner = async (req, res, next) => {
 
 module.exports.generateRentalRequest = async (req, res, next) => {
     try {
-        const { userId } = req.body
+        const { userData } = req
+        const { _id, username, phoneNumber } = userData
+        const userId = _id
+        const { ownerId, posterId, numberOfPeople } = req.body
+        console.log(userId)
         const requestByThisUser = await RentalRequest.findOne({ userId: userId })
         if (requestByThisUser) {
             return res.status(200).json({ message: 'Bạn đã từng đăng kí thuê bất động sản này mà chưa được phê duyệt, vui lòng xóa yêu cầu cũ đi' })
         }
-        const newRequest = new RentalRequest({ ...req.body })
+        const newRequest = new RentalRequest({ userId, ownerId, username, phoneNumber, phoneNumber, posterId, numberOfPeople })
         const isSaved = newRequest.save()
         res.status(200).json({
             saved: isSaved,
@@ -55,6 +62,7 @@ module.exports.generateRentalRequest = async (req, res, next) => {
 module.exports.deleteRentalRequest = async (req, res, next) => {
     try {
         const { rentalRequestId } = req.params
+        console.log(rentalRequestId)
         const deleteMessage = await RentalRequest.findByIdAndDelete(rentalRequestId)
         res.status(200).json({
             deleted: deleteMessage,
