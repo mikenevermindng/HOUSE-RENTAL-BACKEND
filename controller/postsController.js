@@ -201,13 +201,36 @@ module.exports.requestUpdatePostById = async (req, res, next) => {
 	}
 };
 
+module.exports.updateAvailableDate = async (req, res, next) => {
+	const { _id } = req.userData
+	const { posterId } = req.params
+	console.log(_id, posterId)
+	console.log(req.body)
+	try {
+		const post = await AccommodationPost.findOne({ _id: posterId, ownerId: _id })
+		post.availableDate = req.body
+		const saved = await post.save()
+		console.log(saved)
+		res.status(200).json({
+			message: 'success',
+			updated: "updated"
+		})
+	} catch (error) {
+		console.log(error)
+		res.status(400).json({
+			message: 'fail',
+		})
+	}
+}
+
 module.exports.approvedPoster = async (req, res, next) => {
 	try {
 		const { accommodationPostId } = req.params
-		const updated = await AccommodationPost.findOneAndUpdate(
-			{ _id: accommodationPostId },
-			{ isApproved: true }
-		);
+		const poster = await AccommodationPost.findOne({ _id: accommodationPostId });
+		poster.isApproved = true
+		const saved = await poster.save()
+		console.log(saved)
+		Notification.answerRequestNotificationGenerator(poster.ownerId, poster._id, true);
 		res.status(200).json({ message: "approved" })
 	} catch (error) {
 		console.log(error)

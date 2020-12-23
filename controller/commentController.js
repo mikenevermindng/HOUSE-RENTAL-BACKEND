@@ -23,6 +23,7 @@ module.exports.getComment = async (req, res, next) => {
 
 module.exports.getPosterCommnet = async (req, res, next) => {
 	try {
+		console.log('calling')
 		const { posterId } = req.params
 		const comments = await Comment.find({ postId: posterId, isApproved: true })
 		res.status(200).json({ count: comments.length, comments: comments })

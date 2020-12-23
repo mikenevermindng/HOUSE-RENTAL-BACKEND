@@ -41,10 +41,10 @@ const notificationSchema = mongoose.Schema({
 	}
 });
 
-notificationSchema.statics.approvalNotificationGenerator = async function(senderId, senderName) {
+notificationSchema.statics.approvalNotificationGenerator = async function (senderId, senderName) {
 	return new this({
 		senderName: senderName,
-		content: ' yêu cầu đăng poster cho thuê nhà',
+		content: ' yêu cầu đăng bài cho thuê nhà',
 		senderId: senderId,
 		isSentToAdmin: true,
 		recieverIds: null,
@@ -52,7 +52,7 @@ notificationSchema.statics.approvalNotificationGenerator = async function(sender
 	});
 };
 
-notificationSchema.statics.answerRequestNotificationGenerator = async function(recieverId, postId, isApproved) {
+notificationSchema.statics.answerRequestNotificationGenerator = async function (recieverId, postId, isApproved) {
 	return new this({
 		senderName: 'Admin',
 		content: isApproved ? ' đã chấp thuận bài đăng của bạn' : ' đã từ chối yêu cầu đăng bài của bạn',

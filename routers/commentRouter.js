@@ -4,7 +4,7 @@ const { verifyToken, isOwner, isAdmin, isUser } = require('../middleware/authent
 
 route.get('/:commentId', controller.getComment);
 
-route.get('/', controller.getAllComments)
+route.get('/', verifyToken, isAdmin, controller.getAllComments)
 
 route.get('/posterComment/:posterId', controller.getPosterCommnet)
 

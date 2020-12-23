@@ -22,6 +22,8 @@ route.get('/getWithFilterOptions/', verifyToken, isOwner, controller.getPosterBy
 
 route.post('/userGetPoster', recordingMiddleware.saveRequest, controller.getPosterForuser)
 
+route.put('/updateAvailableDate/:posterId', verifyToken, isOwner, controller.updateAvailableDate)
+
 route.get('/getFavoritesPoster/', verifyToken, isUser, controller.getFavoritesPoster)
 
 route.get('/:accommodationPostId', controller.getPostById);

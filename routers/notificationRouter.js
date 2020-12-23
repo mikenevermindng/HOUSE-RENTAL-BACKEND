@@ -5,4 +5,6 @@ const { verifyToken, isOwner, isAdmin } = require('../middleware/authenticationV
 
 route.get('/admin', verifyToken, isAdmin, controller.getNotificationToAdmin)
 
-route.get('/:ownerId', verifyToken, isOwner, controller.getNotificationToOwner)
+route.get('/', verifyToken, isOwner, controller.getNotificationToOwner)
+
+module.exports = route
