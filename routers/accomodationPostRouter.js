@@ -3,7 +3,7 @@ const controller = require('../controller/postsController');
 var path = require('path');
 const recordingMiddleware = require('../middleware/searchingRequestRecorder')
 
-const { verifyToken, isOwner, isAdmin, isUser } = require('../middleware/authenticationVerification')
+const { verifyToken, isOwner, isAdmin, isUser, isOwnerOrAdmin } = require('../middleware/authenticationVerification')
 
 const multer = require('multer');
 const storage = multer.diskStorage({
@@ -34,7 +34,7 @@ route.patch('/:accommodationPostId', verifyToken, isAdmin, controller.approvedPo
 
 route.patch('/updateStatus/:accommodationPostId', verifyToken, isOwner, controller.updateStatus)
 
-route.post('/', verifyToken, isOwner, controller.generateAccommodationPoster);
+route.post('/', verifyToken, isOwnerOrAdmin, controller.generateAccommodationPoster);
 
 route.delete('/:accommodationPostId', verifyToken, isAdmin, controller.deletePostById);
 

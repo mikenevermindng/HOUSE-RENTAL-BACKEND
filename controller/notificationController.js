@@ -4,6 +4,7 @@ const { RESPONSE_MESSAGE } = require('../Constants/MessageConstants');
 module.exports.getNotificationToAdmin = async (req, res, next) => {
 	try {
 		const notifications = await Notification.find({ isSentToAdmin: true }).sort([['postedDate', -1]]);
+		console.log(notifications)
 		res.status(200).json({
 			data: notifications,
 			message: RESPONSE_MESSAGE.SUCCESS
@@ -16,9 +17,6 @@ module.exports.getNotificationToAdmin = async (req, res, next) => {
 module.exports.getNotificationToOwner = async (req, res, next) => {
 	try {
 		const { _id } = req.userData;
-
-		console.log(_id)
-
 		const notifications = await Notification.find({ recieverId: _id }).sort([['postedDate', -1]]);
 		res.status(200).json({
 			data: notifications,

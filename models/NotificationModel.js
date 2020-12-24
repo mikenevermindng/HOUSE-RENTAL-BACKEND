@@ -49,13 +49,13 @@ notificationSchema.statics.approvalNotificationGenerator = async function (sende
 		isSentToAdmin: true,
 		recieverIds: null,
 		code: POST_NOTIFICATION_CODE.APPROVAL_REQUEST
-	});
+	}).save();
 };
 
-notificationSchema.statics.answerRequestNotificationGenerator = async function (recieverId, postId, isApproved) {
+notificationSchema.statics.answerRequestNotificationGenerator = async function (recieverId, postId, title, isApproved) {
 	return new this({
 		senderName: 'Admin',
-		content: isApproved ? ' đã chấp thuận bài đăng của bạn' : ' đã từ chối yêu cầu đăng bài của bạn',
+		content: isApproved ? ' đã chấp thuận bài đăng ' + title + ' của bạn' : ' đã từ chối yêu cầu và xóa bài đăng ' + title + ' của bạn',
 		recieverId: recieverId,
 		isSentToAdmin: false,
 		code: POST_NOTIFICATION_CODE.ACCEPTED_POSTER

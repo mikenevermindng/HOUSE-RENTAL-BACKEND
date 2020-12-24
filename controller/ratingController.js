@@ -12,7 +12,7 @@ module.exports.likeHandler = async (req, res, next) => {
 			const messageDetail = await accessingRating.save();
 			res.status(200).json({ message: 'success', detail: messageDetail });
 		} else {
-			res.status(401).json({ message: 'user liked' });
+			res.status(201).json({ message: 'user liked' });
 		}
 	} catch (error) {
 		console.log(error);

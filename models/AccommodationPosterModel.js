@@ -91,18 +91,21 @@ const postAccommodationSchema = mongoose.Schema({
 	}
 });
 
-postAccommodationSchema.statics.generateAccommodationPoster = async function (info, ownerId, firstName, lastNam) {
+postAccommodationSchema.statics.generateAccommodationPoster = async function (info, ownerId, firstName, lastName, role) {
 	const { materialFacilitiesInfo, accommodationInfo } = info;
 	const materialFacilities = new MaterialFacilities(materialFacilitiesInfo);
 	const rating = new Rating();
 	const post = new this({
 		...accommodationInfo,
-		ownerId: ownerId,
+		ownerId: role === 'ADMIN' ? '5fe37456fc13ae571f000000' : ownerId,
 		rating: rating._id,
-		materialFacilities: materialFacilities._id
+		materialFacilities: materialFacilities._id,
+		isApproved: role === 'ADMIN'
 	});
-	const notification = await Notification.approvalNotificationGenerator(ownerId, firstName + lastNam);
-	const listSaving = [rating, materialFacilities, notification, post];
+	if (role !== 'ADMIN') {
+		const notification = await Notification.approvalNotificationGenerator(ownerId, firstName + lastName);
+	}
+	const listSaving = [rating, materialFacilities, post];
 	return Promise.all(listSaving.map((doc) => doc.save()));
 };
 
@@ -119,10 +122,12 @@ postAccommodationSchema.statics.deletePostById = async function (id) {
 	let accommodationPost = await this.findById(id);
 	let ratingId = accommodationPost.rating._id;
 	let materialFacilitiesId = accommodationPost.materialFacilities._id;
+	const { ownerId, _id, title } = accommodationPost
+	const notification = await Notification.answerRequestNotificationGenerator(ownerId, _id, title, false);
 	return Promise.all([
 		this.deleteOne({ _id: id }),
 		Rating.deleteOne({ _id: ratingId }),
-		MaterialFacilities.deleteOne({ _id: materialFacilitiesId })
+		MaterialFacilities.deleteOne({ _id: materialFacilitiesId }),
 	]);
 };
 

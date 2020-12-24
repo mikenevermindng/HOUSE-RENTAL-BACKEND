@@ -18,7 +18,8 @@ const verifyToken = (req, res, next) => {
         console.log(error)
         return res.status(401).json({
             message: 'Auth failed',
-            error: error
+            error: error,
+            auth: fail
         });
     }
 }
@@ -54,8 +55,7 @@ const isUser = (req, res, next) => {
 }
 
 const isOwnerOrAdmin = (req, res, next) => {
-    if (req.userData.role === ROLE.USER || req.userData.role === ROLE.ADMIN) {
-        req.role = req.userData.role
+    if (req.userData.role === ROLE.OWNER || req.userData.role === ROLE.ADMIN) {
         next()
     } else {
         return res.status(400).json({

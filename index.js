@@ -46,6 +46,7 @@ const rentalRequestRouter = require('./routers/rentalRequestRouter')
 const searchingRecordRouter = require('./routers/seachingRecordRouter')
 const adminRouter = require('./routers/adminRouter')
 const notificationRouter = require('./routers/notificationRouter')
+const reportPosterRouter = require('./routers/reportPosterRouter')
 // Router place
 app.use('/accommodationPost', postAccommodationRouter);
 app.use('/rating', ratingRouter);
@@ -57,6 +58,7 @@ app.use('/rental-request', rentalRequestRouter)
 app.use('/searching-record', searchingRecordRouter)
 app.use('/admin', adminRouter)
 app.use('/notification', notificationRouter)
+app.use('/report', reportPosterRouter)
 
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');

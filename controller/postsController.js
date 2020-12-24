@@ -3,6 +3,7 @@ const MaterialFacilities = require('../models/MaterialFacilitiesModel');
 const Rating = require('../models/RatingModel');
 const Notification = require('../models/NotificationModel');
 const { RESPONSE_MESSAGE } = require('../Constants/MessageConstants');
+const Owner = require('../models/OwnerModel')
 const mongoose = require('mongoose')
 
 module.exports.index = async (req, res, next) => {
@@ -108,9 +109,8 @@ module.exports.getFavoritesPoster = async (req, res, next) => {
 
 module.exports.generateAccommodationPoster = async (req, res, next) => {
 	try {
-		const images = req.files
-		const { _id, firstName, lastName } = req.userData
-		const generateMessage = AccommodationPost.generateAccommodationPoster(req.body, _id, firstName, lastName);
+		const { _id, firstName, lastName, role } = req.userData
+		const generateMessage = AccommodationPost.generateAccommodationPoster(req.body, _id, firstName, lastName, role);
 		const response = {
 			message: 'success',
 			request: {
@@ -209,8 +209,11 @@ module.exports.updateAvailableDate = async (req, res, next) => {
 	try {
 		const post = await AccommodationPost.findOne({ _id: posterId, ownerId: _id })
 		post.availableDate = req.body
+		post.isApproved = false
+		const { ownerId } = post
+		const owner = await Owner.findById(ownerId)
+		const newNotification = await Notification.approvalNotificationGenerator(ownerId, owner.firstName + owner.lastName)
 		const saved = await post.save()
-		console.log(saved)
 		res.status(200).json({
 			message: 'success',
 			updated: "updated"
